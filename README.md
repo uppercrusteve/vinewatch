@@ -133,7 +133,7 @@ esbuild 打包到 `dist/` 并输出文件数/体积；构建与测试在 CI 中�
 
 ```bibtex
 @software{xiao_vinewatch_2026,
-  author  = {Xiao, Yilong},
+  author  = {uppercrusteve},
   title   = {VineWatch: Offline-first grape phenology (BBCH) field notebook PWA},
   year    = {2026},
   version = {0.1.0},
@@ -150,4 +150,4 @@ VineWatch is an offline-first progressive web app for recording grapevine phenol
 
 ## License
 
-[MIT](LICENSE) © 2026 Yilong Xiao
+[MIT](LICENSE) © 2026 uppercrusteve

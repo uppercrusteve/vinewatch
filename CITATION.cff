@@ -9,8 +9,7 @@ abstract: >-
   All records stay in the browser's IndexedDB; data can be exported as
   UTF-8 BOM CSV, GeoJSON points, or a JSON backup.
 authors:
-  - family-names: Xiao
-    given-names: Yilong
+  - name: "uppercrusteve"
     alias: uppercrusteve
 year: 2026
 date-released: 2026-11-17
