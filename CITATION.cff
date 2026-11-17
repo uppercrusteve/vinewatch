@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use VineWatch in field work or teaching, please cite it as below."
+type: software
+title: "VineWatch: offline-first grape phenology (BBCH) field notebook PWA"
+abstract: >-
+  VineWatch is a static, offline-first progressive web app for recording
+  grapevine phenology by plot using a trimmed set of 23 BBCH key stages,
+  optional GPS coordinates, client-side compressed photos, and notes.
+  All records stay in the browser's IndexedDB; data can be exported as
+  UTF-8 BOM CSV, GeoJSON points, or a JSON backup.
+authors:
+  - family-names: Xiao
+    given-names: Yilong
+    alias: YilongXiao
+year: 2026
+date-released: 2026-11-17
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/YilongXiao/vinewatch"
+url: "https://yilongxiao.github.io/vinewatch/"
+keywords:
+  - viticulture
+  - phenology
+  - BBCH
+  - offline-first
+  - PWA
+  - field notebook
+  - open science
