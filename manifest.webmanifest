@@ -1,0 +1,41 @@
+{
+  "name": "藤候 VineWatch · 葡萄物候田间记录",
+  "short_name": "藤候",
+  "description": "离线优先的高海拔葡萄园物候记录：BBCH、GPS、照片与导出，数据只留在本机。",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "background_color": "#f3efe4",
+  "theme_color": "#2b5737",
+  "categories": ["productivity", "utilities", "science"],
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

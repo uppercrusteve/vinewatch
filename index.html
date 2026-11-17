@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>藤候 VineWatch · 离线物候记录</title>
+  <meta name="description" content="离线优先的高海拔葡萄园物候记录工具：BBCH 阶段、GPS、照片与导出，数据只留在本机。">
+  <meta name="theme-color" content="#f3efe4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141a13" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="i-grape" viewBox="0 0 24 24">
+      <path d="M12 3c2 0 3.2 1 3.6 2.2M12 3c-1.5 0-2.6.7-3.2 1.6M12 3v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      <g fill="currentColor"><circle cx="12" cy="9" r="2"/><circle cx="8.8" cy="12" r="2"/><circle cx="15.2" cy="12" r="2"/><circle cx="12" cy="14" r="2"/><circle cx="8.8" cy="17" r="2"/><circle cx="15.2" cy="17" r="2"/><circle cx="12" cy="19.6" r="2"/></g>
+    </symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s6-5.4 6-10a6 6 0 1 0-12 0c0 4.6 6 10 6 10Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="11" r="2.2" fill="currentColor"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V6m0 0 4 4m-4-4L8 10M5 19h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="m4 20 1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"><svg><use href="#i-grape"/></svg></span>
+      <div>
+        <h1>藤候 <span>VineWatch</span></h1>
+        <p>高海拔葡萄物候 · 田间离线记录</p>
+      </div>
+    </div>
+    <div class="header-tools">
+      <span id="storage-status" class="status-pill" data-state="local">
+        <span class="dot" aria-hidden="true"></span><span id="storage-text">本机存储</span>
+      </span>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav class="tabs" role="tablist" aria-label="主要区域">
+      <button class="tab" role="tab" id="tab-records" aria-controls="panel-records" aria-selected="true" data-tab="records">
+        <svg aria-hidden="true"><use href="#i-grape"/></svg><span>记录</span>
+      </button>
+      <button class="tab" role="tab" id="tab-plots" aria-controls="panel-plots" aria-selected="false" tabindex="-1" data-tab="plots">
+        <svg aria-hidden="true"><use href="#i-pin"/></svg><span>地块</span>
+      </button>
+      <button class="tab" role="tab" id="tab-export" aria-controls="panel-export" aria-selected="false" tabindex="-1" data-tab="export">
+        <svg aria-hidden="true"><use href="#i-download"/></svg><span>导出</span>
+      </button>
+    </nav>
+
+    <main id="main" tabindex="-1">
+      <section class="stats" aria-label="记录统计" id="stats">
+        <article class="stat"><span class="stat-label">总记录</span><strong id="stat-total">0</strong></article>
+        <article class="stat"><span class="stat-label">今日记录</span><strong id="stat-today">0</strong></article>
+        <article class="stat"><span class="stat-label">涉及地块</span><strong id="stat-plots">0</strong></article>
+        <article class="stat stat-wide"><span class="stat-label">最近阶段</span><strong id="stat-latest">—</strong><span class="stat-sub" id="stat-latest-date"></span></article>
+      </section>
+
+      <!-- 记录 -->
+      <section class="panel" id="panel-records" role="tabpanel" aria-labelledby="tab-records" tabindex="0">
+        <div class="welcome card" id="welcome" hidden>
+          <h2>从第一块地开始</h2>
+          <p>先建立地块，或载入 12 条合成演示记录，立刻查看完整流程。演示数据会明确标注，可随时清空。</p>
+          <div class="row-actions">
+            <button class="btn btn-primary" type="button" data-go="plots"><svg aria-hidden="true"><use href="#i-plus"/></svg>建立地块</button>
+            <button class="btn" type="button" id="welcome-demo">载入示例数据</button>
+          </div>
+        </div>
+
+        <div class="card form-card">
+          <div class="card-head">
+            <h2 id="form-title">新增记录</h2>
+            <span class="tag" id="edit-flag" hidden>编辑中</span>
+          </div>
+          <form id="record-form" novalidate>
+            <div class="grid-2">
+              <div class="field">
+                <label for="record-plot">地块 <span class="req">必填</span></label>
+                <select id="record-plot" name="plot_id" required>
+                  <option value="">— 请选择地块 —</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="record-variety">品种</label>
+                <input id="record-variety" name="variety" type="text" maxlength="60" placeholder="随地块自动填入，可修改">
+              </div>
+            </div>
+
+            <fieldset class="field stage-field">
+              <legend>BBCH 阶段 <span class="req">必填</span></legend>
+              <p class="hint">按主生长期分组，点选最接近的田间状态；悬停或点选可读说明。</p>
+              <div class="stage-picker" id="stage-picker"></div>
+              <p class="stage-preview" id="stage-preview" aria-live="polite">尚未选择阶段。</p>
+            </fieldset>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="record-date">日期 <span class="req">必填</span></label>
+                <input id="record-date" name="date" type="date" required>
+              </div>
+              <div class="field">
+                <label for="record-photo">照片 <span class="hint-inline">自动压缩至 ≤1280 px</span></label>
+                <input id="record-photo" name="photo" type="file" accept="image/*" capture="environment" class="visually-hidden">
+                <label for="record-photo" class="btn btn-file"><svg aria-hidden="true"><use href="#i-camera"/></svg>拍照 / 选图</label>
+                <p class="hint" id="photo-status" aria-live="polite">尚未选择照片</p>
+              </div>
+            </div>
+            <div class="photo-preview" id="photo-preview" hidden>
+              <img id="photo-thumb" alt="待上传照片预览">
+              <button class="icon-btn" type="button" id="photo-clear" aria-label="移除照片"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+              <span class="photo-meta" id="photo-meta"></span>
+            </div>
+
+            <div class="gps-row">
+              <button class="btn" type="button" id="gps-btn"><svg aria-hidden="true"><use href="#i-pin"/></svg>读取 GPS</button>
+              <p class="hint" id="gps-status" aria-live="polite">坐标可留空（无信号时）。</p>
+            </div>
+
+            <div class="field">
+              <label for="record-note">备注</label>
+              <textarea id="record-note" name="note" rows="3" maxlength="1200" placeholder="天气、病虫害、农事操作、果穗状态…"></textarea>
+            </div>
+
+            <div class="row-actions">
+              <button class="btn btn-primary" type="submit" id="submit-btn"><svg aria-hidden="true"><use href="#i-check"/></svg>保存记录</button>
+              <button class="btn btn-ghost" type="button" id="cancel-edit" hidden>取消编辑</button>
+            </div>
+            <p class="form-error" id="form-error" role="alert" hidden></p>
+          </form>
+        </div>
+
+        <div class="list-head">
+          <h2>田间记录 <span class="count" id="record-count">0</span></h2>
+          <p class="hint">按日期倒序。所有数据保存在此设备浏览器中。</p>
+        </div>
+        <div class="filters card">
+          <div class="search-wrap">
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <label class="visually-hidden" for="search-input">搜索记录</label>
+            <input id="search-input" type="search" placeholder="搜索地块、品种、备注、日期…">
+          </div>
+          <div class="filter-row">
+            <label class="visually-hidden" for="filter-plot">按地块筛选</label>
+            <select id="filter-plot"><option value="">全部地块</option></select>
+            <label class="visually-hidden" for="filter-stage">按阶段筛选</label>
+            <select id="filter-stage"><option value="">全部阶段</option></select>
+            <button class="btn btn-ghost" type="button" id="filter-reset">重置</button>
+          </div>
+        </div>
+        <ul class="record-list" id="record-list" aria-live="polite"></ul>
+        <p class="empty" id="record-empty" hidden>没有匹配的记录。</p>
+      </section>
+
+      <!-- 地块 -->
+      <section class="panel" id="panel-plots" role="tabpanel" aria-labelledby="tab-plots" tabindex="0" hidden>
+        <div class="card form-card">
+          <div class="card-head"><h2 id="plot-form-title">新增地块</h2><span class="tag" id="plot-edit-flag" hidden>编辑中</span></div>
+          <form id="plot-form" novalidate>
+            <div class="grid-2">
+              <div class="field">
+                <label for="plot-name">名称 <span class="req">必填</span></label>
+                <input id="plot-name" name="name" type="text" maxlength="60" placeholder="例：东坡梯田 A3" required>
+              </div>
+              <div class="field">
+                <label for="plot-variety">品种</label>
+                <input id="plot-variety" name="variety" type="text" maxlength="60" placeholder="例：霞多丽">
+              </div>
+              <div class="field">
+                <label for="plot-elevation">海拔（m）</label>
+                <input id="plot-elevation" name="elevation_m" type="number" inputmode="numeric" min="0" max="7000" step="1" placeholder="例：2200">
+              </div>
+              <div class="field">
+                <label for="plot-row">行号 / 方位</label>
+                <input id="plot-row" name="row_note" type="text" maxlength="80" placeholder="例：8–14 行，东南向">
+              </div>
+            </div>
+            <div class="row-actions">
+              <button class="btn btn-primary" type="submit" id="plot-submit"><svg aria-hidden="true"><use href="#i-plus"/></svg>保存地块</button>
+              <button class="btn btn-ghost" type="button" id="plot-cancel" hidden>取消编辑</button>
+            </div>
+            <p class="form-error" id="plot-error" role="alert" hidden></p>
+          </form>
+        </div>
+        <div class="list-head">
+          <h2>地块清单 <span class="count" id="plot-count">0</span></h2>
+          <p class="hint">删除地块会同时删除其全部记录（会先确认）。</p>
+        </div>
+        <ul class="plot-list" id="plot-list"></ul>
+        <p class="empty" id="plot-empty" hidden>还没有地块。先在上方新增一块。</p>
+      </section>
+
+      <!-- 导出 -->
+      <section class="panel" id="panel-export" role="tabpanel" aria-labelledby="tab-export" tabindex="0" hidden>
+        <div class="card">
+          <h2>带走数据</h2>
+          <p class="hint">导出在浏览器本地完成，不上传服务器。CSV 含 UTF-8 BOM，可直接用 Excel 打开；GeoJSON 仅包含有坐标的记录。</p>
+          <div class="export-grid">
+            <button class="btn export-btn" type="button" id="export-csv">
+              <svg aria-hidden="true"><use href="#i-download"/></svg><span><strong>导出 CSV</strong><small>Excel / R / Python 通用</small></span>
+            </button>
+            <button class="btn export-btn" type="button" id="export-geojson">
+              <svg aria-hidden="true"><use href="#i-download"/></svg><span><strong>导出 GeoJSON</strong><small>QGIS / ArcGIS 点图层</small></span>
+            </button>
+            <button class="btn export-btn" type="button" id="export-json">
+              <svg aria-hidden="true"><use href="#i-download"/></svg><span><strong>JSON 全量备份</strong><small>含照片与地块，可再导入</small></span>
+            </button>
+          </div>
+          <p class="export-summary" id="export-summary">0 条记录 · 0 个地块</p>
+        </div>
+
+        <div class="card">
+          <h2>导入 JSON 备份</h2>
+          <p class="hint">按记录 ID 与内容指纹去重；校验失败的行会跳过并列出原因。导入只合并，不覆盖现有数据。</p>
+          <input id="import-file" type="file" accept="application/json,.json" class="visually-hidden">
+          <label for="import-file" class="btn btn-file"><svg aria-hidden="true"><use href="#i-upload"/></svg>选择备份文件</label>
+          <p class="hint" id="import-status" aria-live="polite">尚未导入</p>
+        </div>
+
+        <div class="card">
+          <h2>演示与清理</h2>
+          <p class="hint">演示数据为合成数据，共 3 个虚构地块与 12 条记录，记录内均以「演示：」开头并带演示标记。</p>
+          <div class="row-actions">
+            <button class="btn" type="button" id="demo-btn">载入示例数据</button>
+            <button class="btn btn-danger-ghost" type="button" id="clear-btn">清空全部数据</button>
+          </div>
+        </div>
+
+        <div class="card privacy">
+          <h2>隐私</h2>
+          <p>所有记录、照片与坐标只写入本机 IndexedDB。没有账号、云端同步、CDN 或分析脚本。清理浏览器站点数据会同时删除备份之外的内容。</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="app-footer">
+    <p>BBCH 扩展参考 Lancashire et al. (1991)、Coombe (1995)。界面文案为中文，代码注释为英文。</p>
+    <p>演示数据为合成数据，非实测。</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="noscript">本应用需要启用 JavaScript 才能使用 IndexedDB 记录数据。</p></noscript>
+</body>
+</html>
