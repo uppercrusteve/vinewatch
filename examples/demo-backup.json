@@ -1,0 +1,102 @@
+{
+  "schema": "vinewatch-export",
+  "version": 1,
+  "app": "vinewatch",
+  "exported_at": "2026-11-17T00:00:00.000Z",
+  "counts": { "plots": 2, "records": 5 },
+  "plots": [
+    {
+      "id": "plot_example_a3",
+      "name": "示例东篱 A3",
+      "variety": "霞多丽",
+      "elevation_m": 2210,
+      "row_note": "8–14 行，东南向",
+      "created_at": "2025-04-01T08:00:00.000Z"
+    },
+    {
+      "id": "plot_example_b1",
+      "name": "示例西台 B1",
+      "variety": "赤霞珠",
+      "elevation_m": 2360,
+      "row_note": "坡地对照区",
+      "created_at": "2025-04-01T08:05:00.000Z"
+    }
+  ],
+  "records": [
+    {
+      "id": "rec_example_01",
+      "plot_id": "plot_example_a3",
+      "stage_code": "60",
+      "stage_label": "初花",
+      "date": "2025-05-28",
+      "lat": 27.82142,
+      "lon": 98.95211,
+      "accuracy_m": 6,
+      "photo": null,
+      "note": "示例：首花开放，约 5% 花帽脱落。",
+      "demo": true,
+      "created_at": "2025-05-28T09:10:00.000Z",
+      "updated_at": "2025-05-28T09:10:00.000Z"
+    },
+    {
+      "id": "rec_example_02",
+      "plot_id": "plot_example_a3",
+      "stage_code": "65",
+      "stage_label": "盛花",
+      "date": "2025-06-02",
+      "lat": 27.82139,
+      "lon": 98.95208,
+      "accuracy_m": 5,
+      "photo": null,
+      "note": "示例：约半数花开放，晴朗无风。",
+      "demo": true,
+      "created_at": "2025-06-02T08:45:00.000Z",
+      "updated_at": "2025-06-02T08:45:00.000Z"
+    },
+    {
+      "id": "rec_example_03",
+      "plot_id": "plot_example_b1",
+      "stage_code": "71",
+      "stage_label": "坐果",
+      "date": "2025-06-14",
+      "lat": 27.82554,
+      "lon": 98.95721,
+      "accuracy_m": 8,
+      "photo": null,
+      "note": "示例：子房开始膨大，标记弱穗。",
+      "demo": true,
+      "created_at": "2025-06-14T10:00:00.000Z",
+      "updated_at": "2025-06-14T10:00:00.000Z"
+    },
+    {
+      "id": "rec_example_04",
+      "plot_id": "plot_example_b1",
+      "stage_code": "81",
+      "stage_label": "转色开始",
+      "date": "2025-07-30",
+      "lat": null,
+      "lon": null,
+      "accuracy_m": null,
+      "photo": null,
+      "note": "示例：山谷无信号，未记坐标；少数果穗开始转色。",
+      "demo": true,
+      "created_at": "2025-07-30T11:20:00.000Z",
+      "updated_at": "2025-07-30T11:20:00.000Z"
+    },
+    {
+      "id": "rec_example_05",
+      "plot_id": "plot_example_a3",
+      "stage_code": "89",
+      "stage_label": "采收成熟",
+      "date": "2025-09-08",
+      "lat": 27.82147,
+      "lon": 98.95215,
+      "accuracy_m": 5,
+      "photo": null,
+      "note": "示例：达到目标成熟度，安排采收，备注含逗号、\"引号\"与\n换行。",
+      "demo": true,
+      "created_at": "2025-09-08T07:30:00.000Z",
+      "updated_at": "2025-09-08T07:30:00.000Z"
+    }
+  ]
+}
