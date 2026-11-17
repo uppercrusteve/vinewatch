@@ -11,12 +11,12 @@ abstract: >-
 authors:
   - family-names: Xiao
     given-names: Yilong
-    alias: YilongXiao
+    alias: uppercrusteve
 year: 2026
 date-released: 2026-11-17
 version: 0.1.0
 license: MIT
-repository-code: "https://github.com/YilongXiao/vinewatch"
+repository-code: "https://github.com/uppercrusteve/vinewatch"
 url: "https://yilongxiao.github.io/vinewatch/"
 keywords:
   - viticulture

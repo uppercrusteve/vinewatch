@@ -2,7 +2,7 @@
 
 离线优先的高海拔葡萄物候（BBCH）田间记录 PWA：按地块记下阶段、日期、GPS、照片与备注，**所有数据只留在本机**，随时导出 CSV / GeoJSON。
 
-[![CI](https://github.com/YilongXiao/vinewatch/actions/workflows/ci.yml/badge.svg)](https://github.com/YilongXiao/vinewatch/actions/workflows/ci.yml)
+[![CI](https://github.com/uppercrusteve/vinewatch/actions/workflows/ci.yml/badge.svg)](https://github.com/uppercrusteve/vinewatch/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Node.js 22](https://img.shields.io/badge/node-22-3c873a.svg)](package.json)
 [![PWA](https://img.shields.io/badge/PWA-installable-5a0fc8.svg)](manifest.webmanifest)
@@ -16,7 +16,7 @@
 
 山区葡萄园常没有手机信号，纸质表格又要二次录入、容易抄错阶段和日期。云端记录器一旦断网就停摆，照片还会先被上传。藤候把整条记录路径做进浏览器：打开即用、断网可记、照片在本地压缩、数据随时整包带走，不需要账号或服务器。
 
-**在线演示：** <https://YilongXiao.github.io/vinewatch/>
+**在线演示：** <https://uppercrusteve.github.io/vinewatch/>
 
 ## 功能
 
@@ -37,7 +37,7 @@
 **Windows PowerShell**
 
 ```powershell
-git clone https://github.com/YilongXiao/vinewatch.git
+git clone https://github.com/uppercrusteve/vinewatch.git
 cd vinewatch
 npm ci
 npm test
@@ -48,7 +48,7 @@ npm run dev
 **macOS / Linux**
 
 ```bash
-git clone https://github.com/YilongXiao/vinewatch.git
+git clone https://github.com/uppercrusteve/vinewatch.git
 cd vinewatch
 npm ci
 npm test
@@ -70,7 +70,7 @@ npm run dev
 
 ### GitHub Pages 与离线安装
 
-在线版由 GitHub Pages 提供：<https://YilongXiao.github.io/vinewatch/>。首次访问需要联网，Service Worker 缓存完成后即可离线打开和新增记录。
+在线版由 GitHub Pages 提供：<https://uppercrusteve.github.io/vinewatch/>。首次访问需要联网，Service Worker 缓存完成后即可离线打开和新增记录。
 
 - **Chrome / Edge（桌面）**：地址栏右侧的安装图标，或菜单 →「安装应用」。
 - **Android Chrome**：菜单 →「安装应用」或「添加到主屏幕」。
@@ -137,7 +137,7 @@ esbuild 打包到 `dist/` 并输出文件数/体积；构建与测试在 CI 中�
   title   = {VineWatch: Offline-first grape phenology (BBCH) field notebook PWA},
   year    = {2026},
   version = {0.1.0},
-  url     = {https://github.com/YilongXiao/vinewatch},
+  url     = {https://github.com/uppercrusteve/vinewatch},
   license = {MIT}
 }
 ```

@@ -20,4 +20,4 @@
 - Vitest + jsdom + fake-indexeddb 测试 44 项。
 - esbuild 生产构建与 GitHub Pages 部署工作流。
 
-[0.1.0]: https://github.com/YilongXiao/vinewatch/releases/tag/v0.1.0
+[0.1.0]: https://github.com/uppercrusteve/vinewatch/releases/tag/v0.1.0
