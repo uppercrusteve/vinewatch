@@ -94,7 +94,7 @@ npm run dev
 
 - **CSV**：UTF-8 BOM、CRLF、14 列（记录 ID、地块、品种、海拔、BBCH 编码、阶段、日期、纬度、经度、定位精度、备注、演示标记、创建/更新时间），含逗号、引号、换行或首尾空格的字段会被引号包裹，内部引号翻倍。
 - **GeoJSON**：RFC 7946 `FeatureCollection`，仅包含经纬度均为有限数值且未越界的记录，坐标顺序为 `[经度, 纬度]`。
-- **JSON 备份**：`schema: vinewatch-export`，含全部地块、记录与内嵌照片；导入时按 ID 和「地块 + 阶段 + 日期 + 坐标 + 备注」指纹去重，只合并不覆盖。
+- **JSON 备份**：`schema: vinewatch-export`，含全部地块、记录与内嵌照片；导入时按 ID 和「地块 + 阶段 + 日期 + 坐标 + 精度 + 照片 + 备注」指纹去重，只合并不覆盖。
 
 可直接用 [`examples/demo-backup.json`](examples/demo-backup.json) 在「导出 → 导入 JSON 备份」中试用导入流程。
 
@@ -117,7 +117,7 @@ npm run dev
 npm test
 ```
 
-4 个测试文件、44 项测试，覆盖 BBCH 阶段表与排序、日期边界、地块/记录 CRUD、级联删除、搜索筛选、CSV BOM 与转义、GeoJSON 坐标过滤、JSON 导入校验与去重、照片缩放与压缩错误路径。测试使用 Vitest + jsdom + fake-indexeddb，不需要浏览器。
+4 个测试文件、49 项测试，覆盖 BBCH 阶段表与排序、日期边界、地块/记录 CRUD、级联删除、搜索筛选、CSV BOM、转义与公式前缀、GeoJSON 坐标过滤、JSON 导入校验与去重、照片缩放与压缩错误路径。测试使用 Vitest + jsdom + fake-indexeddb，不需要浏览器。
 
 生产构建：
 
@@ -132,7 +132,7 @@ esbuild 打包到 `dist/` 并输出文件数/体积；构建与测试在 CI 中�
 若在田间工作或教学中使用，请引用：
 
 ```bibtex
-@software{xiao_vinewatch_2026,
+@software{uppercrusteve_vinewatch_2026,
   author  = {uppercrusteve},
   title   = {VineWatch: Offline-first grape phenology (BBCH) field notebook PWA},
   year    = {2026},
