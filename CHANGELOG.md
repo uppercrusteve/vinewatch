@@ -2,7 +2,7 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 的结构，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
-## [Unreleased]
+## [0.1.0] - 2026-11-18
 
 ### Fixed
 
@@ -22,8 +22,6 @@
   apostrophe to stop Excel formula injection.
 - GeoJSON export reports how many records without coordinates were skipped;
   HEIC files get their own error message.
-
-## [0.1.0] - 2026-11-17
 
 ### 新增
 
