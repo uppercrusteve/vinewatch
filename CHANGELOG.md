@@ -2,6 +2,27 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 的结构，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [Unreleased]
+
+### Fixed
+
+- Import fingerprints now include location accuracy and a photo digest, so
+  records that differ only in their photo or GPS accuracy are kept.
+- The record list renders in pages of 200 with a "load more" control and a
+  true total, instead of silently stopping at 500.
+- `updateRecord` and `createRecord` validate the plot inside the same
+  transaction, so a record can no longer point at a deleted plot.
+- Concurrent edits in two tabs no longer overwrite each other's fields.
+- The same-day "latest stage" now follows `created_at` instead of the first
+  key returned by IndexedDB.
+- The service worker cache name is stamped with a build hash, so a new
+  deploy activates a fresh cache; `src/*.js` was dropped from the precache
+  list because the build only ships the bundle.
+- CSV export prefixes text starting with `=`, `+`, `@` or `-` with an
+  apostrophe to stop Excel formula injection.
+- GeoJSON export reports how many records without coordinates were skipped;
+  HEIC files get their own error message.
+
 ## [0.1.0] - 2026-11-17
 
 ### 新增
