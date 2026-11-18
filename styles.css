@@ -363,6 +363,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); }
   text-align: center;
   transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
 }
+.btn[hidden] { display: none; }
+.record-more { width: 100%; margin-top: 10px; }
 .btn svg { width: 19px; height: 19px; flex: 0 0 auto; }
 .btn:hover { background: var(--surface-2); border-color: var(--muted); }
 .btn:active { transform: translateY(1px); }

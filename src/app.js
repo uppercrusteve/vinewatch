@@ -32,6 +32,8 @@ const state = {
   filterPlot: '',
   filterStage: '',
   records: [],
+  recordTotal: 0,
+  recordLimit: 200,
   plots: [],
   counts: {},
   stats: null,
@@ -353,12 +355,19 @@ function renderRecords() {
   const list = $('#record-list');
   list.textContent = '';
   for (const record of state.records) list.append(recordListItem(record));
-  $('#record-count').textContent = String(state.records.length);
+  const truncated = state.records.length < state.recordTotal;
+  $('#record-count').textContent = truncated
+    ? `${state.records.length} / ${state.recordTotal}`
+    : String(state.recordTotal);
   $('#record-empty').hidden = state.records.length > 0;
   if (!state.records.length) {
     $('#record-empty').textContent = state.stats?.total
       ? '没有匹配的记录，试试重置筛选。'
       : '还没有记录。';
+  }
+  $('#record-more').hidden = !truncated;
+  if (truncated) {
+    $('#record-more').textContent = `加载更多（还有 ${state.recordTotal - state.records.length} 条）`;
   }
 }
 
@@ -382,13 +391,15 @@ async function refresh({ keepFocus = false } = {}) {
     listRecords({
       query: state.query,
       plotId: state.filterPlot,
-      stageCode: state.filterStage
+      stageCode: state.filterStage,
+      limit: state.recordLimit
     }),
     countRecordsByPlot(),
     getStats()
   ]);
   state.plots = plots;
-  state.records = records;
+  state.records = records.items;
+  state.recordTotal = records.total;
   state.counts = counts;
   state.stats = stats;
   renderPlotOptions();
@@ -722,7 +733,8 @@ async function exportGeoJSON() {
   const geo = toGeoJSON(records, plots);
   if (!geo.features.length) return toast('没有带坐标的记录', 'error');
   download(JSON.stringify(geo, null, 2), filename('geojson'), 'application/geo+json');
-  toast(`已导出 ${geo.features.length} 个点`);
+  const skipped = records.length - geo.features.length;
+  toast(`已导出 ${geo.features.length} 个点${skipped ? `，跳过 ${skipped} 条无坐标记录` : ''}`);
 }
 
 async function exportJSON() {
@@ -826,21 +838,29 @@ function bindForms() {
 
   $('#search-input').addEventListener('input', (event) => {
     state.query = event.target.value;
+    state.recordLimit = 200;
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => refresh({ keepFocus: true }), 160);
   });
   $('#filter-plot').addEventListener('change', (event) => {
     state.filterPlot = event.target.value;
+    state.recordLimit = 200;
     refresh();
   });
   $('#filter-stage').addEventListener('change', (event) => {
     state.filterStage = event.target.value;
+    state.recordLimit = 200;
+    refresh();
+  });
+  $('#record-more').addEventListener('click', () => {
+    state.recordLimit += 200;
     refresh();
   });
   $('#filter-reset').addEventListener('click', () => {
     state.query = '';
     state.filterPlot = '';
     state.filterStage = '';
+    state.recordLimit = 200;
     $('#search-input').value = '';
     $('#filter-plot').value = '';
     $('#filter-stage').value = '';

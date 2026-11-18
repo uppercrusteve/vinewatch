@@ -35,7 +35,7 @@ function isoOffset(days) {
 
 export async function loadDemo() {
   const existing = await listPlots();
-  if (existing.length || (await listRecords({ limit: 1 })).length) {
+  if (existing.length || (await listRecords({ limit: 1 })).total) {
     return { loaded: false, plots: 0, records: 0 };
   }
   const baseLat = 27.821;
