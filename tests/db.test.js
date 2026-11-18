@@ -71,7 +71,7 @@ describe('地块 CRUD', () => {
     const removed = await deletePlot(plotA.id);
     expect(removed).toBe(2);
     expect((await listPlots()).map((plot) => plot.id)).toEqual([plotB.id]);
-    const records = await listRecords();
+    const records = (await listRecords()).items;
     expect(records).toHaveLength(1);
     expect(records[0].id).toBe(keep.id);
   });
@@ -109,7 +109,7 @@ describe('记录 CRUD 与筛选', () => {
     await makeRecord(plotA.id, { date: '2026-06-01' });
     await makeRecord(plotB.id, { date: '2026-08-01' });
     await makeRecord(plotA.id, { date: '2026-07-01' });
-    const records = await listRecords();
+    const records = (await listRecords()).items;
     expect(records.map((record) => record.date)).toEqual(['2026-08-01', '2026-07-01', '2026-06-01']);
     expect(records[0].plot_name).toBe('西坡 B1');
     expect(records[0].stage_color).toMatch(/^#/);
@@ -118,11 +118,11 @@ describe('记录 CRUD 与筛选', () => {
   it('按地块、阶段与关键词筛选，搜索不区分大小写', async () => {
     await makeRecord(plotA.id, { note: 'Powdery mildew 初现' });
     await makeRecord(plotB.id, { stage_code: '81', note: '开始转色' });
-    expect(await listRecords({ plotId: plotB.id })).toHaveLength(1);
-    expect(await listRecords({ stageCode: '65' })).toHaveLength(1);
-    expect(await listRecords({ query: 'POWDERY' })).toHaveLength(1);
-    expect(await listRecords({ query: '西坡' })).toHaveLength(1);
-    expect(await listRecords({ query: '不存在' })).toHaveLength(0);
+    expect((await listRecords({ plotId: plotB.id })).items).toHaveLength(1);
+    expect((await listRecords({ stageCode: '65' })).items).toHaveLength(1);
+    expect((await listRecords({ query: 'POWDERY' })).items).toHaveLength(1);
+    expect((await listRecords({ query: '西坡' })).items).toHaveLength(1);
+    expect((await listRecords({ query: '不存在' })).items).toHaveLength(0);
   });
 
   it('更新记录写入新值并刷新 updated_at', async () => {
@@ -135,11 +135,17 @@ describe('记录 CRUD 与筛选', () => {
     expect(updated.created_at).toBe(record.created_at);
   });
 
+  it('拒绝把记录改到不存在的地块', async () => {
+    const record = await makeRecord(plotA.id);
+    await expect(updateRecord(record.id, { plot_id: 'plot_ghost' })).rejects.toThrow('地块不存在');
+    expect((await getRecord(record.id)).plot_id).toBe(plotA.id);
+  });
+
   it('删除单条记录后不再返回', async () => {
     const record = await makeRecord(plotA.id);
     await deleteRecord(record.id);
     expect(await getRecord(record.id)).toBeUndefined();
-    expect(await listRecords()).toHaveLength(0);
+    expect((await listRecords()).items).toHaveLength(0);
   });
 
   it('统计返回总数、今日、地块数与最近阶段', async () => {
@@ -152,6 +158,14 @@ describe('记录 CRUD 与筛选', () => {
     expect(stats.plots).toBe(2);
     expect(stats.latestStage.code).toBe('91');
   });
+
+  it('同一天取后录入的记录作为最近阶段', async () => {
+    await makeRecord(plotA.id, { stage_code: '65', date: '2026-08-01' });
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    await makeRecord(plotA.id, { stage_code: '89', date: '2026-08-01' });
+    const stats = await getStats(today);
+    expect(stats.latestStage.code).toBe('89');
+  });
 });
 
 describe('JSON 导入', () => {
@@ -163,7 +177,7 @@ describe('JSON 导入', () => {
     const result = await importData(payload);
     expect(result.imported).toBe(0);
     expect(result.skipped).toBe(2);
-    expect(await listRecords()).toHaveLength(2);
+    expect((await listRecords()).items).toHaveLength(2);
   });
 
   it('跳过无效记录并返回逐行原因', async () => {
@@ -197,12 +211,51 @@ describe('JSON 导入', () => {
     expect(result.imported).toBe(1);
     expect(result.plotsAdded).toBe(1);
     expect(result.errors).toEqual([]);
-    const records = await listRecords();
+    const records = (await listRecords()).items;
     expect(records[0].plot_name).toBe('南坡 D4');
   });
 
   it('拒绝错误 schema 与缺失数组', async () => {
     await expect(importData({ schema: 'other', records: [], plots: [] })).rejects.toThrow('vinewatch');
     await expect(importData({ schema: 'vinewatch-export', plots: [] })).rejects.toThrow('records');
+  });
+});
+
+describe('导入去重指纹', () => {
+  it('保留仅照片或定位精度不同的两条记录', async () => {
+    const base = {
+      plot_id: plotA.id,
+      stage_code: '65',
+      date: today,
+      lat: 27.8,
+      lon: 98.9,
+      note: '同备注'
+    };
+    const payload = {
+      schema: 'vinewatch-export',
+      version: 1,
+      plots: [],
+      records: [
+        { ...base, id: 'rec_photo_a', accuracy_m: 3, photo: 'data:image/jpeg;base64,AAA' },
+        { ...base, id: 'rec_photo_b', accuracy_m: 25, photo: 'data:image/jpeg;base64,BBB' }
+      ]
+    };
+    const result = await importData(payload);
+    expect(result.imported).toBe(2);
+    expect(result.skipped).toBe(0);
+    expect((await listRecords()).total).toBe(2);
+  });
+
+  it('同一份备份重复导入仍按指纹跳过', async () => {
+    const payload = {
+      schema: 'vinewatch-export',
+      version: 1,
+      plots: [],
+      records: [{ id: 'rec_once', plot_id: plotA.id, stage_code: '65', date: today, note: '唯一' }]
+    };
+    expect((await importData(payload)).imported).toBe(1);
+    const second = await importData(payload);
+    expect(second.imported).toBe(0);
+    expect(second.skipped).toBe(1);
   });
 });

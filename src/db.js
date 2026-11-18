@@ -214,28 +214,44 @@ function normalizeRecord(input, id = newId('rec')) {
 }
 
 export async function createRecord(input) {
-  const plot = await getPlot(input.plot_id);
-  if (!plot) throw new Error('所选地块不存在');
   const record = normalizeRecord(input);
   const db = await openDB();
-  const tx = db.transaction(RECORDS, 'readwrite');
+  const tx = db.transaction([RECORDS, PLOTS], 'readwrite');
+  const plot = await requestToPromise(tx.objectStore(PLOTS).get(record.plot_id));
+  if (!plot) {
+    tx.abort();
+    await waitTx(tx).catch(() => {});
+    throw new Error('所选地块不存在');
+  }
   tx.objectStore(RECORDS).add(record);
   await waitTx(tx);
   return record;
 }
 
 export async function updateRecord(id, patch) {
-  const existing = await getRecord(id);
-  if (!existing) throw new Error('记录不存在');
-  const merged = normalizeRecord(
-    { ...existing, ...patch, plot_id: patch.plot_id || existing.plot_id },
-    id
-  );
+  const db = await openDB();
+  // Read and write inside one readwrite transaction. IndexedDB serialises
+  // readwrite transactions on the same stores, so a concurrent edit from
+  // another tab can no longer overwrite fields it never touched.
+  const tx = db.transaction([RECORDS, PLOTS], 'readwrite');
+  const store = tx.objectStore(RECORDS);
+  const existing = await requestToPromise(store.get(id));
+  if (!existing) {
+    tx.abort();
+    await waitTx(tx).catch(() => {});
+    throw new Error('记录不存在');
+  }
+  const plotId = patch.plot_id || existing.plot_id;
+  const plot = await requestToPromise(tx.objectStore(PLOTS).get(plotId));
+  if (!plot) {
+    tx.abort();
+    await waitTx(tx).catch(() => {});
+    throw new Error('所选地块不存在');
+  }
+  const merged = normalizeRecord({ ...existing, ...patch, plot_id: plotId }, id);
   merged.created_at = existing.created_at;
   merged.demo = patch.demo ?? existing.demo;
-  const db = await openDB();
-  const tx = db.transaction(RECORDS, 'readwrite');
-  tx.objectStore(RECORDS).put(merged);
+  store.put(merged);
   await waitTx(tx);
   return merged;
 }
@@ -255,6 +271,8 @@ export async function deleteRecord(id) {
 /**
  * Lists records newest-first with optional search and filters.
  * Search covers plot name, variety, stage label, note and date.
+ * @returns {Promise<{items: object[], total: number}>} the requested page
+ *   plus the total number of matches, so callers can show what was cut off.
  */
 export async function listRecords({ query = '', plotId = '', stageCode = '', limit = 500 } = {}) {
   const [plots, records] = await Promise.all([
@@ -295,7 +313,7 @@ export async function listRecords({ query = '', plotId = '', stageCode = '', lim
       };
     })
     .sort((a, b) => b.date.localeCompare(a.date) || b.created_at.localeCompare(a.created_at));
-  return withPlot.slice(0, limit);
+  return { items: withPlot.slice(0, limit), total: withPlot.length };
 }
 
 export async function countRecordsByPlot() {
@@ -327,7 +345,16 @@ export async function getStats(today = toISODate(new Date())) {
   let latest = null;
   for (const record of all) {
     if (!getStage(record.stage_code)) continue;
-    if (!latest || record.date > latest.date) latest = record;
+    if (!latest) {
+      latest = record;
+      continue;
+    }
+    // Same day: the row entered later wins, matching what the user just saw.
+    if (record.date !== latest.date) {
+      if (record.date > latest.date) latest = record;
+    } else if (String(record.created_at) > String(latest.created_at)) {
+      latest = record;
+    }
   }
   return {
     total: all.length,
@@ -350,6 +377,13 @@ export async function exportAll() {
   return { plots, records };
 }
 
+function photoKey(photo) {
+  // Full data URLs reach megabytes, so fingerprints keep only the length and
+  // both ends. Two different photos matching all three is vanishingly rare.
+  if (!photo) return '';
+  return `${photo.length}:${photo.slice(0, 32)}:${photo.slice(-32)}`;
+}
+
 export function fingerprint(record) {
   return [
     record.plot_id,
@@ -357,6 +391,8 @@ export function fingerprint(record) {
     record.date,
     record.lat ?? '',
     record.lon ?? '',
+    record.accuracy_m ?? '',
+    photoKey(record.photo),
     String(record.note ?? '').trim()
   ].join('|');
 }
