@@ -8,12 +8,8 @@ const PRECACHE = [
   './icons/icon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './src/app.js',
-  './src/bbch.js',
-  './src/db.js',
-  './src/export.js',
-  './src/photo.js',
-  './src/seed.js',
+  // The bundle is what index.html loads in the build; dev pages load src/*.js
+  // and fall back to the runtime cache-first rule below.
   './assets/app.js'
 ];
 
@@ -21,7 +17,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(VERSION);
-      // Individual failures (e.g. dev has no bundle, build has no src) must not abort install.
+      // A single failed request (e.g. dev has no bundle yet) must not abort install.
       await Promise.allSettled(PRECACHE.map((url) => cache.add(new Request(url, { cache: 'reload' }))));
       await self.skipWaiting();
     })()
