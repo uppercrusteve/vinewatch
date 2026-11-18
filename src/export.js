@@ -19,7 +19,12 @@ export const CSV_HEADERS = [
 ];
 
 export function csvEscape(value) {
-  const text = value === null || value === undefined ? '' : String(value);
+  let text = value === null || value === undefined ? '' : String(value);
+  // Excel treats a leading =, +, @ or - as a formula. A leading apostrophe
+  // keeps the cell as text; plain negative numbers are left untouched.
+  if (/^[=+@]/.test(text) || (/^-/.test(text) && !/^-?\d+(\.\d+)?$/.test(text))) {
+    text = `'${text}`;
+  }
   if (/[",\r\n]/.test(text) || /^\s|\s$/.test(text)) {
     return `"${text.replace(/"/g, '""')}"`;
   }

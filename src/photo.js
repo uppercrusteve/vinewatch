@@ -60,7 +60,15 @@ export async function compressImage(file, options = {}) {
   }
   if (file.size > MAX_INPUT_BYTES) throw new Error('照片超过 25 MB，请先裁切');
 
-  const bitmap = await loadBitmap(file);
+  let bitmap;
+  try {
+    bitmap = await loadBitmap(file);
+  } catch (error) {
+    if (type === 'image/heic' || type === 'image/heif') {
+      throw new Error('当前浏览器不能直接解码 HEIC/HEIF，请先在相册中导出为 JPEG');
+    }
+    throw new Error(`无法读取图片：${error.message || '格式不受支持'}`);
+  }
   const srcW = bitmap.width || bitmap.naturalWidth;
   const srcH = bitmap.height || bitmap.naturalHeight;
   const dims = fitDimensions(srcW, srcH, options.maxEdge || MAX_EDGE);

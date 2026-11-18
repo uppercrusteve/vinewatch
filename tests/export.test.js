@@ -47,6 +47,15 @@ describe('CSV', () => {
     expect(csvEscape('plain')).toBe('plain');
   });
 
+  it('公式开头加前导单引号，负数保持数字', () => {
+    expect(csvEscape('=1+2')).toBe("'=1+2");
+    expect(csvEscape('+86')).toBe("'+86");
+    expect(csvEscape('@cmd')).toBe("'@cmd");
+    expect(csvEscape('-HYPERLINK')).toBe("'-HYPERLINK");
+    expect(csvEscape('-3.5')).toBe('-3.5');
+    expect(csvEscape('2026-06-10')).toBe('2026-06-10');
+  });
+
   it('以 UTF-8 BOM 开头、CRLF 分行并含表头', () => {
     const csv = toCSV(records, plots);
     expect(csv.charCodeAt(0)).toBe(0xfeff);
