@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Node.js 22](https://img.shields.io/badge/node-22-3c873a.svg)](package.json)
 [![PWA](https://img.shields.io/badge/PWA-installable-5a0fc8.svg)](manifest.webmanifest)
-[![Tests](https://img.shields.io/badge/tests-44%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-49%20passing-brightgreen.svg)](tests/)
 
 ![藤候 VineWatch 的田间记录列表，使用 12 条合成演示数据](docs/screenshots/app.png)
 
